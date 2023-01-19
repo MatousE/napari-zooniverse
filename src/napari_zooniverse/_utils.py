@@ -1,6 +1,12 @@
 import numpy as np
-
-
+from panoptes_client import Project, Panoptes, Subject, SubjectSet
+import glob
+import os
+import sys
+import getpass
+import re
+#-----------------------------------------------------------------------------------------------------------------------
+# Preprocessing data
 def fill_pixels(img,
                 tile_x_idx,
                 tile_y_idx,
@@ -252,5 +258,92 @@ def loop_over_directory(dir_name, file_format="TIF", n_tiles_x=1, n_tiles_y=1, o
             re.findall(r'\d+', file_root)[-1])  # New method searches for last multi-digit number in the string
         print(f"Z slice: {z_slice}")
         tile_image(img, file_root, z_slice, n_tiles_x=n_tiles_x, n_tiles_y=n_tiles_y, offset=offset)
+
+
+#---------------------------------------------------------------------------------------------
+# Uploading to zooniverse project
+
+# This function builds the subject from the chosen set of images and attaches metadata
+def build_subject(project, file_list, centre_idx, span, step):
+    subject = Subject()  # Inititialise a subject
+    subject.links.project = project  # ...attach it to a project
+    subject.metadata['Subject ID'] = centre_idx - step * span + 1  # Add the names of the images
+
+    # For loop to attach the images to the subject one-by-one
+    for i, idx in enumerate(range(centre_idx - step * span, centre_idx + (step * span) + 1, step)):
+        fname = str(file_list[idx])
+        print("Attaching %s to subject %d" % (os.path.basename(fname), centre_idx - step * span + 1))
+        subject.add_location(fname)
+        subject.metadata['Image %d' % i] = os.path.basename(fname)
+    subject.metadata['default_frame'] = span + 1  # We want people to annotate the middle image
+
+    # Metadata from here should be changed according to the data
+    subject.metadata['Microscope'] = 'SBF SEM (with FCC)'
+    subject.metadata['Raw XY resolution (nm)'] = 5
+    subject.metadata['Raw Z resolution (nm)'] = 50
+    subject.metadata['Scaling factor'] = 2
+    subject.metadata['jpeg quality (%)'] = 90
+    subject.metadata['Attribution'] = 'Matt Russell'
+    subject.metadata['Description'] = 'MP009_FCC_5-161118_Cell1registered-binnedx2 (HeLa)'
+    print("Starting to save")
+    print(subject)
+    subject.save()
+    print("Subject saved")
+
+    return subject
+
+
+def connect_to_zooniverse(project_id=PROJECT_ID, user_name=USERNAME):
+    try:
+        password = getpass.getpass(prompt='Password: ', stream=None)
+        Panoptes.connect(username=user_name, password=password)
+        print("Connected to Zooniverse")
+    except Exception as e:
+        print("Couldn't connect to Zooniverse")
+        print("Exception {}".format(e))
+        sys.exit(1)
+    print(f"Connecting to {project_id}...")
+    project = Project.find(slug=project_id)
+    print("...connected!")
+    return project
+
+
+# Helper function to initialise a "subject set" and attach it to a project
+def initialise_subject_set(project, subject_name):
+    subject_set = SubjectSet()
+    subject_set.links.project = project
+    subject_set.display_name = subject_name
+    subject_set.save()
+    return subject_set
+
+# Helper function to read all of the jpegs in a directory that have the given prefix
+def get_image_list(input_directory, prefix):
+    full_path = os.path.join(input_directory, prefix + '*.jpg')
+    file_list = glob.glob(full_path)
+    print(full_path)
+    n_files = len(file_list)
+    print(f"There are {n_files} jpg files in the directory {input_directory} with prefix {prefix}")
+    return file_list, n_files
+
+
+# Function to build a subject set from a fixed range of images
+def build_subject_set(project, file_list, file_idx_start, file_idx_stop, span, step, testing=False):
+    print(f"project {project}\n",
+          f"file_idx_start {file_idx_start}\n",
+          f"file_idx_stop {file_idx_stop}\n",
+          f"span {span}\n",
+          f"step {step}")
+    print(f"Building subject set from files {file_idx_start}-{file_idx_stop}")
+    subjects = []
+    min_idx = 0
+    max_idx = len(file_list) - span*step
+
+    for centre_idx in range(max(min_idx, file_idx_start), min(max_idx, file_idx_stop) + 1):
+        if testing:
+            print(f"Testing for subject centred on file {centre_idx} in the list")
+        else:
+            subject = build_subject(project, file_list, centre_idx, span, step)
+            subjects.append(subject)
+    return subjects
 
 
