@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     import napari
 
 
-class ExampleQWidget(QWidget):
+class PreprocessWidget(QWidget):
     def __init__(self, napari_viewer):
         super().__init__()
         self.viewer = napari_viewer
