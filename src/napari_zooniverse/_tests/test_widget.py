@@ -14,7 +14,7 @@ def test_example_q_widget(make_napari_viewer, capsys):
     my_widget = PreprocessWidget(viewer)
 
     # call our widget method
-    my_widget._on_click()
+    my_widget._preprocess()
 
     # read captured output and check that it's as we expected
     captured = capsys.readouterr()
