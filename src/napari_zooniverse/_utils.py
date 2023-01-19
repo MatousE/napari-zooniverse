@@ -1,4 +1,29 @@
+import os
 import numpy as np
+from qtpy.QtWidgets import (QLabel,
+                            QWidget,
+                            QHBoxLayout)
+from magicgui.widgets import create_widget
+
+
+def make_widget(annotation, label):
+    w = QWidget()
+    w.setLayout(QHBoxLayout())
+    w.layout().addWidget(QLabel(label))
+
+    magic_w = create_widget(annotation=annotation, label=label)
+    w.layout().addWidget(magic_w.native)
+
+    set_border(w)
+
+    return w, magic_w
+
+
+def set_border(widget: QWidget, spacing=2, margin=0):
+    if hasattr(widget.layout(), "setContentsMargins"):
+        widget.layout().setContentsMargins(margin, margin, margin, margin)
+    if hasattr(widget.layout(), "setSpacing"):
+        widget.layout().setSpacing(spacing)
 
 
 def fill_pixels(img,
@@ -33,17 +58,17 @@ def fill_pixels(img,
     (raw_size_y, raw_size_x) = img.shape
 
     # Calculate the x and y positions of the pixels we want to copy from the raw image
-    x_start_raw = tile_size_ x *tile_x_idx - offset_x
+    x_start_raw = tile_size_x * tile_x_idx - offset_x
     x_stop_raw = x_start_raw + tile_size_x
-    y_start_raw = tile_size_ y *tile_y_idx - offset_y
+    y_start_raw = tile_size_y * tile_y_idx - offset_y
     y_stop_raw = y_start_raw + tile_size_y
 
     # In an offset image, the "start" position might be negative, or larger than the image size, so we need to "clip"
     # these values to valid pixel positions
-    clip_y_start = np.clip(y_start_raw, 0, raw_size_y -1)
-    clip_y_stop = np.clip(y_stop_raw, 0, raw_size_y -1)
-    clip_x_start = np.clip(x_start_raw, 0, raw_size_x -1)
-    clip_x_stop = np.clip(x_stop_raw, 0, raw_size_x -1)
+    clip_y_start = np.clip(y_start_raw, 0, raw_size_y - 1)
+    clip_y_stop = np.clip(y_stop_raw, 0, raw_size_y - 1)
+    clip_x_start = np.clip(x_start_raw, 0, raw_size_x - 1)
+    clip_x_stop = np.clip(x_stop_raw, 0, raw_size_x - 1)
 
     size_x_clip = clip_x_stop - clip_x_start
     size_y_clip = clip_y_stop - clip_y_start
@@ -63,7 +88,8 @@ def fill_pixels(img,
     fill_y_stop = fill_y_start + size_y_clip
     fill_x_stop = fill_x_start + size_x_clip
 
-    tile_data[fill_y_start:fill_y_stop, fill_x_start:fill_x_stop] = img[clip_y_start:clip_y_stop, clip_x_start:clip_x_stop]
+    tile_data[fill_y_start:fill_y_stop, fill_x_start:fill_x_stop] = img[clip_y_start:clip_y_stop,
+                                                                    clip_x_start:clip_x_stop]
 
     print(f"Raw:\tX {clip_x_start}:{clip_x_stop}; Y {clip_y_start}:{clip_y_stop}")
 
@@ -82,9 +108,9 @@ def fill_pixels_RGB(input_image,
                     dtype=np.uint8):
     """ Run the fill_pixels function for each channel of an RGB
     """
-    R = input_image[: ,: ,0]
-    G = input_image[: ,: ,1]
-    B = input_image[: ,: ,2]
+    R = input_image[:, :, 0]
+    G = input_image[:, :, 1]
+    B = input_image[:, :, 2]
 
     R_tile = fill_pixels(R,
                          tile_x_idx,
@@ -118,10 +144,10 @@ def fill_pixels_RGB(input_image,
                          offset_x,
                          offset_y,
                          dtype)
-    RGB_tile = np.zeros(shape=(tile_size_y, tile_size_x, 3) ,dtype=np.uint8)
-    RGB_tile[: ,: ,0] = R_tile
-    RGB_tile[: ,: ,1] = G_tile
-    RGB_tile[: ,: ,2] = B_tile
+    RGB_tile = np.zeros(shape=(tile_size_y, tile_size_x, 3), dtype=np.uint8)
+    RGB_tile[:, :, 0] = R_tile
+    RGB_tile[:, :, 1] = G_tile
+    RGB_tile[:, :, 2] = B_tile
 
     return RGB_tile
 
@@ -235,6 +261,7 @@ def test_single_image(dir_name, file_format="TIF", file_index=1, n_tiles_x=1, n_
     print(f"Z slice: {z_slice}")
     tile_image(img, file_root, z_slice, n_tiles_x=n_tiles_x, n_tiles_y=n_tiles_y, offset=offset, show_plot=True)
 
+
 def loop_over_directory(dir_name, file_format="TIF", n_tiles_x=1, n_tiles_y=1, offset=False):
     print(f"Reading from '{dir_name}'")
     files = glob.glob(os.path.join(dir_name, f"*.{file_format.lower()}*"))
@@ -252,5 +279,3 @@ def loop_over_directory(dir_name, file_format="TIF", n_tiles_x=1, n_tiles_y=1, o
             re.findall(r'\d+', file_root)[-1])  # New method searches for last multi-digit number in the string
         print(f"Z slice: {z_slice}")
         tile_image(img, file_root, z_slice, n_tiles_x=n_tiles_x, n_tiles_y=n_tiles_y, offset=offset)
-
-
