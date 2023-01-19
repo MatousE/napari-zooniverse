@@ -8,7 +8,9 @@ from qtpy.QtWidgets import (QHBoxLayout,
                             QWidget,
                             QLabel,
                             QComboBox,
-                            QSpinBox)
+                            QSpinBox,
+                            QFileDialog,
+                            QLineEdit)
 from superqt import QCollapsible
 from ._utils import make_widget, set_border
 
@@ -140,9 +142,23 @@ class PreprocessWidget(QWidget):
         self.subject_preview_button = QPushButton("Preview Subject Sets")
         set_border(self.subject_preview_button)
         self.subject_collapse.addWidget(self.subject_preview_button)
+        self.subject_preview_button.clicked.connect(self._subject_set_preview)
 
         set_border(self.subject_collapse)
         self.layout().addWidget(self.subject_collapse)
+
+        # OUTPUT DIRECTORY FILE DIALOGUE
+        # ------------------------------
+        # OPEN FILE DIALOGUE
+        self._open_file_button = QPushButton("Open File")
+        self._open_file_path = QLineEdit()
+        open_file_widget = QWidget()
+        open_file_widget.setLayout(QHBoxLayout())
+        open_file_widget.layout().addWidget(self._open_file_button)
+        open_file_widget.layout().addWidget(self._open_file_path)
+        set_border(open_file_widget)
+        self.layout().addWidget(open_file_widget)
+        self._open_file_button.clicked.connect(self.open_file_dialogue)
 
         # ADDING PREPROCESS BUTTON AND CONNECTING TO FUNCTION
         # ----------------------------------------
@@ -170,7 +186,26 @@ class PreprocessWidget(QWidget):
             self.roi_checkbox.setChecked(True)
 
     def _tiling_roi_preview(self):
+        """
+        FUNCTION CALLED WHEN  DOING TILING/ROI PREVIEW
+
+
+        :return:
+        """
+        image = self.image_select.value.data
+
+        if self.roi_checkbox.isChecked():
+            rois = self.viewer.layers[self.roi_select.currentText()].data
+
+            pass
+        else:
+            pass
+
         print("preview_on_click")
+
+
+    def _subject_set_preview(self):
+        pass
 
     def _on_selection(self, event=None):
         """
@@ -185,4 +220,21 @@ class PreprocessWidget(QWidget):
         self._roi_on_click()
 
     def _preprocess(self):
+        """
+        FINAL PREPROCESS FUNCTION
+
+        :return:
+        """
+
         print("napari has", len(self.viewer.layers), "layers")
+
+    def open_file_dialogue(self):
+        """
+        If the `Open File` button is clicked a FielDialog will open
+        and the users selected model will update the _open_file_path
+        var.
+
+        :return: path to the model.
+        """
+        filename = QFileDialog.getOpenFileName(self, 'Open File', '/', '*.json')
+        self._open_file_path.setText(filename[0])
