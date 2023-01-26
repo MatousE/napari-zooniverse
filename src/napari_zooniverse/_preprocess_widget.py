@@ -1,3 +1,4 @@
+import warnings
 from typing import TYPE_CHECKING
 import cv2
 import numpy as np
@@ -14,6 +15,7 @@ from qtpy.QtWidgets import (QHBoxLayout,
                             QFileDialog,
                             QLineEdit)
 from superqt import QCollapsible
+from skimage.color import rgb2gray
 from ._utils import make_widget, set_border
 
 
@@ -84,6 +86,7 @@ class PreprocessWidget(QWidget):
         tiling_widget.layout().addWidget(x_label)
 
         self.tiling_n_tiles_x = QSpinBox()
+        self.tiling_n_tiles_x.setMinimum(1)
         set_border(self.tiling_n_tiles_x)
         tiling_widget.layout().addWidget(self.tiling_n_tiles_x)
 
@@ -92,6 +95,7 @@ class PreprocessWidget(QWidget):
         tiling_widget.layout().addWidget(y_label)
 
         self.tiling_n_tiles_y = QSpinBox()
+        self.tiling_n_tiles_y.setMinimum(1)
         set_border(self.tiling_n_tiles_y)
         tiling_widget.layout().addWidget(self.tiling_n_tiles_y)
 
@@ -194,10 +198,24 @@ class PreprocessWidget(QWidget):
 
         :return:
         """
+        if self.image_select.value.data is None:
+            warnings.warn("Image not selected")
+            return
+
         image = np.array(self.image_select.value.data)
-        image_shape = image.shape
+
+        if image.ndim == 2:
+            print(image.reshape((1,) + image.shape).shape)
+        elif image.ndim == 3 & image.shape[2] == 3:
+            image = rgb2gray(image)
+            image = image.reshape((1,) + image.shape)
+            print(image.shape)
 
         if self.roi_checkbox.isChecked():
+            if self.roi_select.currentText() is None:
+                warnings.warn("No Shapes ROI selected")
+                return
+
             shapes = self.viewer.layers[self.roi_select.currentText()].data
             shape_types = self.viewer.layers[self.roi_select.currentText()].shape_type
             mask = np.zeros(image[0].shape)
@@ -210,6 +228,19 @@ class PreprocessWidget(QWidget):
 
         if self.tiling_checkbox.isChecked():
             print("tiling now")
+
+            x = self.tiling_n_tiles_x.value()
+            y = self.tiling_n_tiles_y.value()
+
+            image_w_grid = []
+            for i in range(len(image)):
+                im = image[i]
+                dx, dy = round(im.shape[0] / y), round(im.shape[1] / x)
+                im[:, ::dy] = 0
+                im[::dx, :] = 0
+                image_w_grid.append(im)
+
+            self.viewer.add_image(np.asarray(image_w_grid))
 
         print("preview_on_click")
 
