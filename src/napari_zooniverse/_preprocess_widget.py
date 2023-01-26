@@ -225,6 +225,7 @@ class PreprocessWidget(QWidget):
                 shape = np.array([shape[i][::-1] for i in range(len(shape))])
                 cv2.fillPoly(mask, [shape], 1)
             self.viewer.add_image(image * mask)
+            return
 
         if self.tiling_checkbox.isChecked():
             print("tiling now")
@@ -241,8 +242,7 @@ class PreprocessWidget(QWidget):
                 image_w_grid.append(im)
 
             self.viewer.add_image(np.asarray(image_w_grid))
-
-        print("preview_on_click")
+            return
 
     def _subject_set_preview(self):
         pass
