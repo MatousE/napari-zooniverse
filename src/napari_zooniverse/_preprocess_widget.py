@@ -1,4 +1,6 @@
 from typing import TYPE_CHECKING
+import cv2
+import numpy as np
 from napari.layers import Image, Shapes
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import (QHBoxLayout,
@@ -192,17 +194,24 @@ class PreprocessWidget(QWidget):
 
         :return:
         """
-        image = self.image_select.value.data
+        image = np.array(self.image_select.value.data)
+        image_shape = image.shape
 
         if self.roi_checkbox.isChecked():
-            rois = self.viewer.layers[self.roi_select.currentText()].data
+            shapes = self.viewer.layers[self.roi_select.currentText()].data
+            shape_types = self.viewer.layers[self.roi_select.currentText()].shape_type
+            mask = np.zeros(image[0].shape)
+            for shape_count, [shape, shape_type] in enumerate(zip(shapes,
+                                                                  shape_types)):
+                shape = np.array(shape[:, 1:], dtype=np.int32)
+                shape = np.array([shape[i][::-1] for i in range(len(shape))])
+                cv2.fillPoly(mask, [shape], 1)
+            self.viewer.add_image(image * mask)
 
-            pass
-        else:
-            pass
+        if self.tiling_checkbox.isChecked():
+            print("tiling now")
 
         print("preview_on_click")
-
 
     def _subject_set_preview(self):
         pass
