@@ -2,6 +2,7 @@ import warnings
 from typing import TYPE_CHECKING
 import cv2
 import numpy as np
+from pathlib import Path
 from napari.layers import Image, Shapes
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import (QHBoxLayout,
@@ -130,8 +131,8 @@ class PreprocessWidget(QWidget):
         set_border(step_widget)
         step_label = QLabel("Step")
         step_widget.layout().addWidget(step_label)
-        self.span_value = QSpinBox()
-        step_widget.layout().addWidget(self.span_value)
+        self.step_val = QSpinBox()
+        step_widget.layout().addWidget(self.step_val)
         self.subject_collapse.addWidget(step_widget)
 
         # SUBJECT SET SIZE
@@ -156,7 +157,7 @@ class PreprocessWidget(QWidget):
         # OUTPUT DIRECTORY FILE DIALOGUE
         # ------------------------------
         # OPEN FILE DIALOGUE
-        self._open_file_button = QPushButton("Open File")
+        self._open_file_button = QPushButton("Output Directory")
         self._open_file_path = QLineEdit()
         open_file_widget = QWidget()
         open_file_widget.setLayout(QHBoxLayout())
@@ -245,7 +246,31 @@ class PreprocessWidget(QWidget):
             return
 
     def _subject_set_preview(self):
-        pass
+        if self.image_select.value.data is None:
+            warnings.warn("Image not selected")
+            return
+
+        span = self.span_value.value()
+        step = self.step_val.value()
+        subject_set_size = self.subject_set_size_value.value()
+
+        image = np.array(self.image_select.value.data)
+
+        starting_index = span * step
+
+        subject_set = []
+        for counter, list_start_abs in enumerate(range(starting_index, starting_index + len(image) - 2 * span * step, subject_set_size)):
+            print("Subject:", list_start_abs)
+            subject = []
+            for i, idx in enumerate(range(list_start_abs - step * span, list_start_abs + (step * span) + 1, step)):
+                print("Image:", idx)
+                subject.append(image[idx])
+
+            subject_set.append(subject)
+
+        subject_set = np.asarray(subject_set)
+        print(subject_set.shape)
+        self.viewer.add_image(np.asarray(subject_set))
 
     def _on_selection(self, event=None):
         """
@@ -266,6 +291,18 @@ class PreprocessWidget(QWidget):
         :return:
         """
 
+        if self.image_select.value.data is None:
+            warnings.warn("Image not selected")
+            return
+
+        image = np.array(self.image_select.value.data)
+
+        if self.roi_checkbox.isChecked():
+            pass
+        if self.tiling_checkbox.isChecked():
+            pass
+
+
         print("napari has", len(self.viewer.layers), "layers")
 
     def open_file_dialogue(self):
@@ -276,5 +313,5 @@ class PreprocessWidget(QWidget):
 
         :return: path to the model.
         """
-        filename = QFileDialog.getOpenFileName(self, 'Open File', '/', '*.json')
-        self._open_file_path.setText(filename[0])
+        output_path = QFileDialog.getExistingDirectory(self, 'Output Directory', str(Path))
+        self._open_file_path.setText(output_path)
