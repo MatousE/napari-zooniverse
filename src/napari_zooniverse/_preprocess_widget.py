@@ -1,3 +1,4 @@
+import os
 import warnings
 from typing import TYPE_CHECKING
 import cv2
@@ -17,6 +18,7 @@ from qtpy.QtWidgets import (QHBoxLayout,
                             QLineEdit)
 from superqt import QCollapsible
 from skimage.color import rgb2gray
+from skimage.io import imsave
 from ._utils import make_widget, set_border
 
 
@@ -259,7 +261,8 @@ class PreprocessWidget(QWidget):
         starting_index = span * step
 
         subject_set = []
-        for counter, list_start_abs in enumerate(range(starting_index, starting_index + len(image) - 2 * span * step, subject_set_size)):
+        for counter, list_start_abs in enumerate(
+                range(starting_index, starting_index + len(image) - 2 * span * step, subject_set_size)):
             print("Subject:", list_start_abs)
             subject = []
             for i, idx in enumerate(range(list_start_abs - step * span, list_start_abs + (step * span) + 1, step)):
@@ -298,12 +301,42 @@ class PreprocessWidget(QWidget):
         image = np.array(self.image_select.value.data)
 
         if self.roi_checkbox.isChecked():
-            pass
+            if self.roi_select.currentText() == "":
+                warnings.warn("No Shapes ROI selected")
+                return
+
+            shapes = self.viewer.layers[self.roi_select.currentText()].data
+
+            output_path = self._open_file_path.text()
+            if output_path == '':
+                warnings.warn("Output directory not selected")
+                return
+            output_path += '/subject_sets'
+
+            if not os.path.exists(output_path):
+                os.mkdir(output_path)
+
+            for shape in shapes:
+                shape = np.array(shape[:, 1:], dtype=np.int32)
+                print(shape.shape)
+                print(shape)
+
+                min_y, max_y = shape[0][0], shape[2][0]
+                min_x, max_x = shape[0][1], shape[1][1]
+
+                subject_path = output_path + '/image_x{0}_y{1}'.format(str(min_x).rjust(4, "0"),
+                                                                       str(min_y).rjust(4, "0"))
+
+                os.mkdir(subject_path)
+
+                for i in range(len(image)):
+                    imsave(subject_path + '/image_x{0}_y{1}_z{2}.jpeg'.format(str(min_x).rjust(4, "0"),
+                                                                              str(min_y).rjust(4, "0"),
+                                                                              str(i).rjust(4, "0"))
+                           , image[i][min_y:max_y, min_x:max_x])
+
         if self.tiling_checkbox.isChecked():
             pass
-
-
-        print("napari has", len(self.viewer.layers), "layers")
 
     def open_file_dialogue(self):
         """
