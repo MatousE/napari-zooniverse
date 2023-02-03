@@ -1,10 +1,9 @@
 import os
 import warnings
-from typing import TYPE_CHECKING
 import cv2
 import numpy as np
-from pathlib import Path
 from napari.layers import Image, Shapes
+from pathlib import Path
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import (QHBoxLayout,
                             QCheckBox,
@@ -16,9 +15,9 @@ from qtpy.QtWidgets import (QHBoxLayout,
                             QSpinBox,
                             QFileDialog,
                             QLineEdit)
-from superqt import QCollapsible
 from skimage.color import rgb2gray
 from skimage.io import imsave
+from superqt import QCollapsible
 from ._utils import make_widget, set_border
 
 
@@ -336,7 +335,32 @@ class PreprocessWidget(QWidget):
                            , image[i][min_y:max_y, min_x:max_x])
 
         if self.tiling_checkbox.isChecked():
-            pass
+            x = self.tiling_n_tiles_x.value()
+            y = self.tiling_n_tiles_y.value()
+
+            output_path = self._open_file_path.text()
+            if output_path == '':
+                warnings.warn("Output directory not selected")
+                return
+            output_path += '/subject_sets'
+
+            if not os.path.exists(output_path):
+                os.mkdir(output_path)
+
+            M = image.shape[1] // x
+            N = image.shape[2] // y
+            for y in range(0, image.shape[2], N):
+                for x in range(0, image.shape[1], M):
+                    tile = np.asarray(image[:, x:x + M, y:y + N])
+                    if tile.shape[1] == M and tile.shape[2] == N:
+                        subject_path = output_path + '/image_x{0}_y{1}'.format(str(x).rjust(4, "0"),
+                                                                               str(y).rjust(4, "0"))
+                        os.mkdir(subject_path)
+                        for z in range(len(tile)):
+                            file_name = "img_x{}_y{}_z{}.jpeg".format(str(x).rjust(4, "0"),
+                                                                      str(y).rjust(4, "0"),
+                                                                      str(z).rjust(4, "0"))
+                            imsave(subject_path + '/' + file_name, tile[z])
 
     def open_file_dialogue(self):
         """
