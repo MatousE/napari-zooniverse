@@ -1,4 +1,8 @@
+import sys
+import getpass
+from napari.utils.notifications import show_info, show_error
 from pathlib import Path
+from panoptes_client import Project, Panoptes, Subject, SubjectSet
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import (QHBoxLayout,
                             QPushButton,
@@ -69,20 +73,30 @@ class UploadWidget(QWidget):
         set_border(zooniverse_password_widget)
         self.layout().addWidget(zooniverse_password_widget)
 
+        # ZOONIVERSE PASSWORD WIDGET
+        zooniverse_project_label = QLabel("Zooniverse Project:")
+        self.zooniverse_project = QLineEdit()
+        zooniverse_project_widget = QWidget()
+        zooniverse_project_widget.setLayout(QHBoxLayout())
+        zooniverse_project_widget.layout().addWidget(zooniverse_project_label)
+        zooniverse_project_widget.layout().addWidget(self.zooniverse_project)
+        set_border(zooniverse_project_widget)
+        self.layout().addWidget(zooniverse_project_widget)
+
         # ZOONIVERSE LOGIN BUTTON
         self.zooniverse_login_button = QPushButton("Login")
         self.zooniverse_login_button.clicked.connect(self._login)
         self.layout().addWidget(self.zooniverse_login_button)
 
-        # ZOONIVERSE PROJECT DROP-DOWN
-        zooniverse_project_label = QLabel("Zooniverse Projects")
-        self.zooniverse_project_combobox = QComboBox()
-        zooniverse_project_widget = QWidget()
-        zooniverse_project_widget.setLayout(QHBoxLayout())
-        zooniverse_project_widget.layout().addWidget(zooniverse_project_label)
-        zooniverse_project_widget.layout().addWidget(self.zooniverse_project_combobox)
-        set_border(zooniverse_project_widget)
-        self.layout().addWidget(zooniverse_project_widget)
+        # # ZOONIVERSE PROJECT DROP-DOWN
+        # zooniverse_project_label = QLabel("Zooniverse Projects")
+        # self.zooniverse_project_combobox = QComboBox()
+        # zooniverse_project_widget = QWidget()
+        # zooniverse_project_widget.setLayout(QHBoxLayout())
+        # zooniverse_project_widget.layout().addWidget(zooniverse_project_label)
+        # zooniverse_project_widget.layout().addWidget(self.zooniverse_project_combobox)
+        # set_border(zooniverse_project_widget)
+        # self.layout().addWidget(zooniverse_project_widget)
 
         # SUBJECT SET NAME
         subject_set_label = QLabel("Subject Set Name:")
@@ -115,4 +129,9 @@ class UploadWidget(QWidget):
         self._open_dir_path.setText(output_path)
 
     def _login(self):
-        pass
+        try:
+            self.user = Panoptes.connect(username=self.zooniverse_username.text(), password=self.zooniverse_password.text())
+            self.project = Project.find(slug=self.zooniverse_project.text())
+            show_info("Connected to Zooniverse")
+        except Exception as e:
+            show_error("Exception {}".format(e))
