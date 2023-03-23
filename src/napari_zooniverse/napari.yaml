@@ -8,8 +8,13 @@ contributions:
     - id: napari-zooniverse.upload_widget
       python_name: napari_zooniverse._upload_widget:UploadWidget
       title: Upload Widget
+    - id: napari-zooniverse.visualise_classification_widget
+      python_name: napari_zooniverse._visualise_classification_widget:VisualiseClassificationWidget
+      title: Visualise Classification
   widgets:
     - command: napari-zooniverse.preprocess_widget
       display_name: Preprocessing Widget
     - command: napari-zooniverse.upload_widget
       display_name: Upload Widget
+    - command: napari-zooniverse.visualise_classification_widget
+      display_name: Visualise Classification
