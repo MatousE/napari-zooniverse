@@ -112,49 +112,6 @@ class PreprocessWidget(QWidget):
         set_border(self.tile_collapse)
         self.layout().addWidget(self.tile_collapse)
 
-        # SUBJECT SET COLLAPSABLE
-        # -----------------------
-        self.subject_collapse = QCollapsible("Subject Set Options", self)
-
-        # SPAN
-        span_widget = QWidget()
-        span_widget.setLayout(QHBoxLayout())
-        set_border(span_widget)
-        span_label = QLabel("Span")
-        span_widget.layout().addWidget(span_label)
-        self.span_value = QSpinBox()
-        span_widget.layout().addWidget(self.span_value)
-        self.subject_collapse.addWidget(span_widget)
-
-        # STEP
-        step_widget = QWidget()
-        step_widget.setLayout(QHBoxLayout())
-        set_border(step_widget)
-        step_label = QLabel("Step")
-        step_widget.layout().addWidget(step_label)
-        self.step_val = QSpinBox()
-        step_widget.layout().addWidget(self.step_val)
-        self.subject_collapse.addWidget(step_widget)
-
-        # SUBJECT SET SIZE
-        subject_set_size_widget = QWidget()
-        subject_set_size_widget.setLayout(QHBoxLayout())
-        set_border(subject_set_size_widget)
-        subject_set_size_label = QLabel("Subject Set Size")
-        subject_set_size_widget.layout().addWidget(subject_set_size_label)
-        self.subject_set_size_value = QSpinBox()
-        subject_set_size_widget.layout().addWidget(self.subject_set_size_value)
-        self.subject_collapse.addWidget(subject_set_size_widget)
-
-        # SUBJECT PREVIEW BUTTON
-        self.subject_preview_button = QPushButton("Preview Subject Sets")
-        set_border(self.subject_preview_button)
-        self.subject_collapse.addWidget(self.subject_preview_button)
-        self.subject_preview_button.clicked.connect(self._subject_set_preview)
-
-        set_border(self.subject_collapse)
-        self.layout().addWidget(self.subject_collapse)
-
         # OUTPUT DIRECTORY FILE DIALOGUE
         # ------------------------------
         # OPEN FILE DIALOGUE
@@ -245,34 +202,6 @@ class PreprocessWidget(QWidget):
 
             self.viewer.add_image(np.asarray(image_w_grid))
             return
-
-    def _subject_set_preview(self):
-        if self.image_select.value.data is None:
-            warnings.warn("Image not selected")
-            return
-
-        span = self.span_value.value()
-        step = self.step_val.value()
-        subject_set_size = self.subject_set_size_value.value()
-
-        image = np.array(self.image_select.value.data)
-
-        starting_index = span * step
-
-        subject_set = []
-        for counter, list_start_abs in enumerate(
-                range(starting_index, starting_index + len(image) - 2 * span * step, subject_set_size)):
-            print("Subject:", list_start_abs)
-            subject = []
-            for i, idx in enumerate(range(list_start_abs - step * span, list_start_abs + (step * span) + 1, step)):
-                print("Image:", idx)
-                subject.append(image[idx])
-
-            subject_set.append(subject)
-
-        subject_set = np.asarray(subject_set)
-        print(subject_set.shape)
-        self.viewer.add_image(np.asarray(subject_set))
 
     def _on_selection(self, event=None):
         """
