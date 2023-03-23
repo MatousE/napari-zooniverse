@@ -2,39 +2,12 @@ name: napari-zooniverse
 display_name: napari-zooniverse
 contributions:
   commands:
-    - id: napari-zooniverse.get_reader
-      python_name: napari_zooniverse._reader:napari_get_reader
-      title: Open data with Plugin to manipulate large three-dimensional data and upload it to a Zooniverse project
-    - id: napari-zooniverse.write_multiple
-      python_name: napari_zooniverse._writer:write_multiple
-      title: Save multi-layer data with Plugin to manipulate large three-dimensional data and upload it to a Zooniverse project
-    - id: napari-zooniverse.write_single_image
-      python_name: napari_zooniverse._writer:write_single_image
-      title: Save image data with Plugin to manipulate large three-dimensional data and upload it to a Zooniverse project
-    - id: napari-zooniverse.make_sample_data
-      python_name: napari_zooniverse._sample_data:make_sample_data
-      title: Load sample data from Plugin to manipulate large three-dimensional data and upload it to a Zooniverse project
     - id: napari-zooniverse.preprocess_widget
       python_name: napari_zooniverse._preprocess_widget:PreprocessWidget
       title: Preprocessing Widget
     - id: napari-zooniverse.upload_widget
       python_name: napari_zooniverse._upload_widget:UploadWidget
       title: Upload Widget
-  readers:
-    - command: napari-zooniverse.get_reader
-      accepts_directories: false
-      filename_patterns: ['*.npy']
-  writers:
-    - command: napari-zooniverse.write_multiple
-      layer_types: ['image*','labels*']
-      filename_extensions: []
-    - command: napari-zooniverse.write_single_image
-      layer_types: ['image']
-      filename_extensions: ['.npy']
-  sample_data:
-    - command: napari-zooniverse.make_sample_data
-      display_name: Plugin to manipulate large three-dimensional data and upload it to a Zooniverse project
-      key: unique_id.1
   widgets:
     - command: napari-zooniverse.preprocess_widget
       display_name: Preprocessing Widget
