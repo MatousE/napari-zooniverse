@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.cfg
+src/napari_zooniverse/__init__.py
+src/napari_zooniverse/_preprocess_widget.py
+src/napari_zooniverse/_upload_widget.py
+src/napari_zooniverse/_utils.py
+src/napari_zooniverse/_visualise_classification_widget.py
+src/napari_zooniverse/napari.yaml
+src/napari_zooniverse.egg-info/PKG-INFO
+src/napari_zooniverse.egg-info/SOURCES.txt
+src/napari_zooniverse.egg-info/dependency_links.txt
+src/napari_zooniverse.egg-info/entry_points.txt
+src/napari_zooniverse.egg-info/requires.txt
+src/napari_zooniverse.egg-info/top_level.txt

@@ -1,0 +1,2 @@
+[napari.manifest]
+napari-zooniverse = napari_zooniverse:napari.yaml
