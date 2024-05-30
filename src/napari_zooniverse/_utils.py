@@ -50,13 +50,11 @@ def build_subject(project, file_list, centre_idx, span, step):
     subject.metadata['default_frame'] = span + 1  # We want people to annotate the middle image
 
     # Metadata from here should be changed according to the data
-    subject.metadata['Microscope'] = 'SBF SEM (with FCC)'
+#    subject.metadata['Microscope'] = 'SBF SEM (with FCC)'
     subject.metadata['Raw XY resolution (nm)'] = 5
     subject.metadata['Raw Z resolution (nm)'] = 50
     subject.metadata['Scaling factor'] = 2
-    subject.metadata['jpeg quality (%)'] = 90
-    subject.metadata['Attribution'] = 'Matt Russell'
-    subject.metadata['Description'] = 'MP009_FCC_5-161118_Cell1registered-binnedx2 (HeLa)'
+    subject.metadata['Description'] = 'MRC Multimodal biopsy'
     print("Starting to save")
     print(subject)
     subject.save()

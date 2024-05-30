@@ -38,7 +38,7 @@ class UploadWidget(QWidget):
         # -----------------------
         plugin_label_font = QFont()
         plugin_label_font.setPointSize(20)
-        self.plugin_label = QLabel("Subject Set Uploading Tool")
+        self.plugin_label = QLabel("Subject Set Uploading Tool (MRC)")
         self.plugin_label.setFont(plugin_label_font)
         self.layout().addWidget(self.plugin_label)
 
