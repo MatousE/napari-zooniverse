@@ -221,6 +221,7 @@ class PreprocessWidget(QWidget):
 
         :return:
         """
+        layer_name = self.viewer.layers.selection.active.name 
 
         if self.image_select.value.data is None:
             warnings.warn("Image not selected")
@@ -252,8 +253,9 @@ class PreprocessWidget(QWidget):
                 min_y, max_y = shape[0][0], shape[2][0]
                 min_x, max_x = shape[0][1], shape[1][1]
 
-                subject_path = output_path + '/image_x{0}_y{1}'.format(str(min_x).rjust(4, "0"),
-                                                                       str(min_y).rjust(4, "0"))
+                subject_path = output_path + '/{0}_x{1}_y{2}'.format(layer_name,
+                                                                    str(min_x).rjust(4, "0"),
+                                                                    str(min_y).rjust(4, "0"))
 
                 os.mkdir(subject_path)
 
@@ -263,6 +265,7 @@ class PreprocessWidget(QWidget):
                                                                               str(i).rjust(4, "0"))
                            , image[i][min_y:max_y, min_x:max_x])
 
+        
         if self.tiling_checkbox.isChecked():
             x = self.tiling_n_tiles_x.value()
             y = self.tiling_n_tiles_y.value()
@@ -282,11 +285,13 @@ class PreprocessWidget(QWidget):
                 for x in range(0, image.shape[1], M):
                     tile = np.asarray(image[:, x:x + M, y:y + N])
                     if tile.shape[1] == M and tile.shape[2] == N:
-                        subject_path = output_path + '/image_x{0}_y{1}'.format(str(x).rjust(4, "0"),
+                        subject_path = output_path + '/{0}_x{1}_y{2}'.format(layer_name,
+                                                                               str(x).rjust(4, "0"),
                                                                                str(y).rjust(4, "0"))
                         os.mkdir(subject_path)
                         for z in range(len(tile)):
-                            file_name = "img_x{}_y{}_z{}.jpeg".format(str(x).rjust(4, "0"),
+                            file_name = "{}_x{}_y{}_z{}.jpeg".format(layer_name,
+                                                                      str(x).rjust(4, "0"),
                                                                       str(y).rjust(4, "0"),
                                                                       str(z).rjust(4, "0"))
                             imsave(subject_path + '/' + file_name, tile[z])

@@ -219,7 +219,7 @@ class UploadWidget(QWidget):
                   f"Filename: {file_name}\n"
                   f"Start index: {starting_index}\n")
             list_end = z_end - minimum_z  # list_start + subject_set_size
-            subject_set_name = f"{span}_{step}_{prefix}_z{z_start}-{z_end:04d}"
+            subject_set_name = f"{span}_{step}_{prefix}_z{z_start:04d}-{z_end:04d}"
             print(subject_set_name)
 
             try:
