@@ -82,7 +82,7 @@ def build_subject_set(project, file_list, file_idx_start, file_idx_stop, span, s
     min_idx = 0
     max_idx = len(file_list) - span * step
 
-    for centre_idx in range(max(min_idx, file_idx_start), min(max_idx, file_idx_stop) + 1):
+    for centre_idx in range(max(min_idx, file_idx_start), min(max_idx, file_idx_stop) + 1, 50):
         if testing:
             print(f"Testing for subject centred on file {centre_idx} in the list")
         else:

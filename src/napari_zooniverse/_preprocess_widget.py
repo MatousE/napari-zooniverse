@@ -293,7 +293,7 @@ class PreprocessWidget(QWidget):
 
     def open_file_dialogue(self):
         """
-        If the `Open File` button is clicked a FielDialog will open
+        If the `Open File` button is clicked a FileDialog will open
         and the users selected model will update the _open_file_path
         var.
 

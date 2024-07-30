@@ -142,7 +142,8 @@ class UploadWidget(QWidget):
         subject_set_size_label = QLabel("Subject Set Size")
         subject_set_size_widget.layout().addWidget(subject_set_size_label)
         self.subject_set_size_value = QSpinBox()
-        self.subject_set_size_value.setValue(5)
+        self.subject_set_size_value.setMaximum(1000)
+        self.subject_set_size_value.setValue(1000)
         subject_set_size_widget.layout().addWidget(self.subject_set_size_value)
         self.subject_collapse.addWidget(subject_set_size_widget)
 
@@ -186,6 +187,7 @@ class UploadWidget(QWidget):
 
         *prefix_list, z_str = file_list[0].split('_z')
 
+        Z_TMP = 1
         minimum_z = int(z_str.split('.jpeg')[0])
         starting_index = span * step + minimum_z  # This is the first index that we can build a 5 slice subject from
         successful_uploads = 0
