@@ -176,6 +176,7 @@ class UploadWidget(QWidget):
     def _upload(self):
         print("napari has", len(self.viewer.layers), "layers")
 
+        layer_name = self.viewer.layers.selection.active.name
         span = self.span_value.value()
         step = self.step_value.value()
         subject_set_size = self.subject_set_size_value.value()
@@ -219,7 +220,7 @@ class UploadWidget(QWidget):
                   f"Filename: {file_name}\n"
                   f"Start index: {starting_index}\n")
             list_end = z_end - minimum_z  # list_start + subject_set_size
-            subject_set_name = f"{span}_{step}_{prefix}_z{z_start:04d}-{z_end:04d}"
+            subject_set_name = f"{layer_name}_{span}_{step}_{prefix}_z{z_start:04d}-{z_end:04d}" # TODO: this should be from the selected file name rather than the layer name?
             print(subject_set_name)
 
             try:
