@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: napari-zooniverse
 Version: 0.0.1
 Summary: Plugin to manipulate large three-dimensional data and upload it to a Zooniverse project

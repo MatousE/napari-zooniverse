@@ -220,7 +220,7 @@ class UploadWidget(QWidget):
                   f"Filename: {file_name}\n"
                   f"Start index: {starting_index}\n")
             list_end = z_end - minimum_z  # list_start + subject_set_size
-            subject_set_name = f"{layer_name}_{span}_{step}_{prefix}_z{z_start:04d}-{z_end:04d}" # TODO: this should be from the selected file name rather than the layer name?
+            subject_set_name = f"{self.subject_set_name}_{span}_{step}_{prefix}_z{z_start:04d}-{z_end:04d}" # TODO: this should be from the selected file name rather than the layer name?
             print(subject_set_name)
 
             try:

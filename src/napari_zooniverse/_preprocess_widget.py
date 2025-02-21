@@ -296,6 +296,8 @@ class PreprocessWidget(QWidget):
                                                                       str(z).rjust(4, "0"))
                             imsave(subject_path + '/' + file_name, tile[z])
 
+                            print(f"Writing {file_name} in {subject_path}")
+
     def open_file_dialogue(self):
         """
         If the `Open File` button is clicked a FileDialog will open
